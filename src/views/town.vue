@@ -20,7 +20,7 @@
           class="npc"
           @click.stop="toggleDialogue(npc.id)"
         >
-          <img :src="npc.imageUrl" :alt="npc.name" class="npc-image" />
+          <img :src="getImageUrl(npc.imageUrl)" :alt="npc.name" class="npc-image" />
         </div>
         <div v-if="npc.isTalking" class="speech-bubble">
           {{ npc.quotes[npc.currentQuoteIndex] }}
@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { npcService } from '../api/npcService';
+import { getImageUrl } from '@/utils/imageHelper';
 
 interface RenderableNPC {
   id: number;
