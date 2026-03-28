@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "movie": "電影",
+    "bookTown": "書香小鎮",
+    "library": "圖書館"
+  },
+  "library": {
+    "welcomeTitle": "歡迎來到圖書館",
+    "welcomeSubtitle": "探索經典文學，沉浸在無盡的故事中。",
+    "externalLinks": "外部連結"
+  },
+  "movie": {
+    "liveChat": "即時聊天",
+    "watching": "{count} 人觀看中",
+    "placeholder": "說點什麼...",
+    "send": "發送"
+  }
+}

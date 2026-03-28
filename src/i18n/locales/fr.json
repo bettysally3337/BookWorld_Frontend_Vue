@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "movie": "Film",
+    "bookTown": "Libreria",
+    "library": "Bibliothèque"
+  },
+  "library": {
+    "welcomeTitle": "Bienvenue à la Bibliothèque",
+    "welcomeSubtitle": "Explorez la littérature classique et des histoires sans fin.",
+    "externalLinks": "LIENS EXTERNES"
+  },
+  "movie": {
+    "liveChat": "Chat en direct",
+    "watching": "{count} spectateurs",
+    "placeholder": "Dites quelque chose...",
+    "send": "Envoyer"
+  }
+}

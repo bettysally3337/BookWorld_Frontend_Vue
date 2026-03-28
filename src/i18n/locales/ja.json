@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "movie": "映画",
+    "bookTown": "ブックタウン",
+    "library": "図書館"
+  },
+  "library": {
+    "welcomeTitle": "図書館へようこそ",
+    "welcomeSubtitle": "古典文学を探求し、終わりのない物語に浸りましょう。",
+    "externalLinks": "外部リンク"
+  },
+  "movie": {
+    "liveChat": "ライブチャット",
+    "watching": "{count} 人が視聴中",
+    "placeholder": "何か言って...",
+    "send": "送信"
+  }
+}
