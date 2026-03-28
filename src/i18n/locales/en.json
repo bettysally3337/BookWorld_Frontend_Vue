@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "movie": "Movie",
+    "bookTown": "BookTown",
+    "library": "Library"
+  },
+  "library": {
+    "welcomeTitle": "Welcome to the Library",
+    "welcomeSubtitle": "Explore classic literature and endless stories inside.",
+    "externalLinks": "EXTERNAL LINKS"
+  },
+  "movie": {
+    "liveChat": "Live Chat",
+    "watching": "{count} watching",
+    "placeholder": "Say something...",
+    "send": "Send"
+  }
+}

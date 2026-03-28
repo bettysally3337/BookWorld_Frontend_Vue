@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "movie": "Película",
+    "bookTown": "Pueblo del Libro",
+    "library": "Biblioteca"
+  },
+  "library": {
+    "welcomeTitle": "Bienvenido a la Biblioteca",
+    "welcomeSubtitle": "Explora la literatura clásica y sus historias interminables.",
+    "externalLinks": "ENLACES EXTERNOS"
+  },
+  "movie": {
+    "liveChat": "Chat en vivo",
+    "watching": "{count} espectadores",
+    "placeholder": "Di algo...",
+    "send": "Enviar"
+  }
+}

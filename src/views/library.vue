@@ -1,8 +1,8 @@
 <template>
   <div class="library-container">
     <div class="header">
-      <h2>Welcome to the Library</h2>
-      <p>Explore classic literature and endless stories inside.</p>
+      <h2>{{ $t('library.welcomeTitle') }}</h2>
+      <p>{{ $t('library.welcomeSubtitle') }}</p>
     </div>
 
     <!-- Loading State -->
@@ -47,7 +47,7 @@
         </div>
 
         <div class="links-section">
-          <h4>External Links</h4>
+          <h4>{{ $t('library.externalLinks') }}</h4>
           <a v-if="selectedBook.links?.booksTw" :href="selectedBook.links.booksTw" target="_blank" rel="noopener noreferrer" class="ext-link">Buy on Books.com.tw 📖</a>
           <a v-if="selectedBook.links?.eslite" :href="selectedBook.links.eslite" target="_blank" rel="noopener noreferrer" class="ext-link">Buy on Eslite 📚</a>
           <a v-if="selectedBook.links?.penguin" :href="selectedBook.links.penguin" target="_blank" rel="noopener noreferrer" class="ext-link">Penguin Random House 🐧</a>

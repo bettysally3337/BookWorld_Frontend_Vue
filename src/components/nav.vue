@@ -7,21 +7,21 @@
         :class="{ active: modelValue === 'movie' }"
         @click="$emit('update:modelValue', 'movie')"
       >
-        Movie
+        {{ $t('nav.movie') }}
       </button>
       <button 
         class="nav-tab" 
         :class="{ active: modelValue === 'bookTown' }"
         @click="$emit('update:modelValue', 'bookTown')"
       >
-        BookTown
+        {{ $t('nav.bookTown') }}
       </button>
       <button 
         class="nav-tab" 
         :class="{ active: modelValue === 'library' }"
         @click="$emit('update:modelValue', 'library')"
       >
-        Library
+        {{ $t('nav.library') }}
       </button>
       <button 
         class="theme-toggle"
@@ -30,6 +30,13 @@
       >
         {{ isDarkMode ? '🌙' : '☕' }}
       </button>
+      <select v-model="$i18n.locale" class="lang-selector">
+        <option value="en">EN</option>
+        <option value="zh-TW">繁體中文</option>
+        <option value="ja">日本語</option>
+        <option value="fr">Français</option>
+        <option value="es">Español</option>
+      </select>
     </div>
   </nav>
 </template>
@@ -91,7 +98,7 @@ defineEmits<{
       }
     }
     
-    .theme-toggle {
+      .theme-toggle {
       background: none;
       border: none;
       font-size: 1.5rem;
@@ -104,6 +111,23 @@ defineEmits<{
       &:hover {
         background-color: var(--bg-secondary);
         transform: scale(1.1);
+      }
+    }
+
+    .lang-selector {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      outline: none;
+      transition: border-color 0.3s;
+      
+      &:hover {
+        border-color: var(--accent-color);
       }
     }
   }
