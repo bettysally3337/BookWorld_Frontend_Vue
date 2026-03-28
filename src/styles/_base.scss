@@ -27,3 +27,13 @@ body {
     display: flex;
     flex-direction: column;
 }
+
+/* Base Elements */
+button {
+
+    &:focus,
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+}

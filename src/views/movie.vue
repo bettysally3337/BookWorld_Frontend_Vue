@@ -1,65 +1,72 @@
 <template>
   <div class="movie-page">
-    <div class="video-section">
-      <div class="video-player">
-        <div class="video-screen">
-          <div class="play-button">▶</div>
-        </div>
-        <div class="video-controls">
-          <div class="progress-bar">
-            <div class="progress-fill"></div>
+    <!-- Left Section: Screen & Seating -->
+    <div class="theater-area">
+      <div class="screen-section">
+        <div class="video-player">
+          <div class="video-screen">
+            <div class="play-button">▶</div>
+            <div class="screen-glow"></div>
           </div>
-          <div class="controls-row">
-            <span>00:00 / 02:30</span>
-            <div class="spacer"></div>
-            <span>⚙️ 🔲</span>
+          <div class="video-controls">
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+            <div class="controls-row">
+              <span>00:00 / 02:30</span>
+              <div class="spacer"></div>
+              <span>⚙️ 🔲</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="video-info">
-        <h2>Midnight Adventure</h2>
-        <p>Watching together with 12 others</p>
+
+      <!-- Seating Area (Audience) -->
+      <div class="seating-section">
+        <div class="seating-grid">
+          <div v-for="npc in npcs" :key="npc.id" class="seat-container">
+            <div class="audience-member">
+              <img :src="getImageUrl(npc.imageUrl)" :alt="npc.name" class="npc-head" />
+            </div>
+            <div class="seat-chair"></div>
+          </div>
+        </div>
+        <div class="floor-shadow"></div>
       </div>
     </div>
     
-    <div class="sidebar">
-      <div class="online-users">
-        <h3>Online Viewers ({{ viewers.length }})</h3>
-        <ul class="user-list">
-          <li v-for="user in viewers" :key="user.id" class="user-item">
-            <div class="avatar" :style="{ backgroundColor: user.color }">
-              {{ user.name.charAt(0) }}
-            </div>
-            <span>{{ user.name }}</span>
-            <span v-if="user.isHost" class="host-badge">HOST</span>
-          </li>
-        </ul>
+    <!-- Right Section: Chatroom -->
+    <aside class="chat-sidebar">
+      <div class="chat-header">
+        <h3>{{ $t('movie.liveChat') }}</h3>
+        <span class="viewer-count">{{ $t('movie.watching', { count: viewers.length }) }}</span>
       </div>
       
-      <div class="chat-room">
-        <h3>Live Chat</h3>
-        <div class="chat-messages" ref="chatBox">
-          <div v-for="msg in messages" :key="msg.id" class="message">
-            <span class="msg-author" :style="{ color: msg.color }">{{ msg.author }}:</span>
-            <span class="msg-text">{{ msg.text }}</span>
-          </div>
-        </div>
-        <div class="chat-input-area">
-          <input 
-            v-model="newMessage" 
-            type="text" 
-            placeholder="Type a message..." 
-            @keyup.enter="sendMessage"
-          />
-          <button @click="sendMessage">Send</button>
+      <div class="chat-messages" ref="chatBox">
+        <div v-for="msg in messages" :key="msg.id" class="message">
+          <span class="msg-author" :style="{ color: msg.color }">{{ msg.author }}:</span>
+          <span class="msg-text">{{ msg.text }}</span>
         </div>
       </div>
-    </div>
+
+      <div class="chat-input-area">
+        <input 
+          v-model="newMessage" 
+          type="text" 
+          :placeholder="$t('movie.placeholder')" 
+          @keyup.enter="sendMessage"
+        />
+        <button @click="sendMessage">{{ $t('movie.send') }}</button>
+      </div>
+    </aside>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
+import { npcService } from '../api/npcService';
+import { getImageUrl } from '@/utils/imageHelper';
+import type { NPCData } from '../api/mockData';
 
 interface User {
   id: number;
@@ -75,8 +82,9 @@ interface Message {
   text: string;
 }
 
+const npcs = ref<NPCData[]>([]);
 const viewers = ref<User[]>([
-  { id: 1, name: 'You', color: '#3498db', isHost: true },
+  { id: 1, name: 'You', color: 'var(--accent-color)', isHost: true },
   { id: 2, name: 'Alice', color: '#e74c3c' },
   { id: 3, name: 'Bob', color: '#f39c12' },
   { id: 4, name: 'Charlie', color: '#9b59b6' },
@@ -85,8 +93,8 @@ const viewers = ref<User[]>([
 
 const messages = ref<Message[]>([
   { id: 1, author: 'Alice', color: '#e74c3c', text: 'Hi everyone! Ready to watch?' },
-  { id: 2, author: 'Bob', color: '#f39c12', text: 'Yes, been waiting for this!' },
-  { id: 3, author: 'Charlie', color: '#9b59b6', text: 'Popcorn is ready 🍿' }
+  { id: 2, author: 'Bob', color: '#f39c12', text: 'Classic movie time! 🎥' },
+  { id: 3, author: 'Charlie', color: '#9b59b6', text: 'The seating is cozy!' }
 ]);
 
 const newMessage = ref('');
@@ -105,26 +113,30 @@ const sendMessage = () => {
   messages.value.push({
     id: Date.now(),
     author: 'You',
-    color: '#3498db',
+    color: 'var(--accent-color)',
     text: newMessage.value.trim()
   });
   
   newMessage.value = '';
   scrollToBottom();
   
-  // Simulate reply
   setTimeout(() => {
     messages.value.push({
       id: Date.now(),
       author: 'Diana',
       color: '#1abc9c',
-      text: 'Haha, me too!'
+      text: 'Totally agree!'
     });
     scrollToBottom();
-  }, 3000);
+  }, 2000);
 };
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    npcs.value = await npcService.getAllActiveCharacters();
+  } catch (error) {
+    console.error("Failed to fetch NPCs for seating", error);
+  }
   scrollToBottom();
 });
 </script>
@@ -133,268 +145,241 @@ onMounted(() => {
 .movie-page {
   display: flex;
   height: calc(100vh - 70px);
-  background-color: #0f1115;
-  color: #fff;
+  background-color: var(--bg-main);
+  transition: background-color 0.3s ease;
+  overflow: hidden;
 }
 
-.video-section {
+.theater-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  background: radial-gradient(circle at center top, var(--bg-secondary) 0%, var(--bg-main) 100%);
+  position: relative;
   overflow-y: auto;
+}
+
+.screen-section {
+  padding: 3rem 4rem 1rem;
+  display: flex;
+  justify-content: center;
 }
 
 .video-player {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 900px;
   aspect-ratio: 16 / 9;
   background-color: #000;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  border-radius: 4px;
   position: relative;
+  box-shadow: 0 0 50px rgba(0,0,0,0.5);
+  border: 4px solid #111;
+  overflow: hidden;
 }
 
 .video-screen {
-  flex: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, #2a2d34 0%, #000 100%);
+  background: black;
+  position: relative;
   cursor: pointer;
-  
+
   .play-button {
-    font-size: 4rem;
-    color: rgba(255, 255, 255, 0.8);
-    transition: transform 0.2s, color 0.2s;
-    
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.4);
+    z-index: 2;
+    transition: all 0.2s;
     &:hover {
-      transform: scale(1.1);
       color: #fff;
+      transform: scale(1.1);
     }
+  }
+
+  .screen-glow {
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 100px;
+    background: linear-gradient(to top, rgba(255,255,255,0.05), transparent);
+    filter: blur(20px);
+    pointer-events: none;
   }
 }
 
 .video-controls {
-  height: 50px;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-  padding: 0 1rem;
-  display: flex;
-  flex-direction: column;
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 0 1rem 0.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  color: #ccc;
+  font-size: 0.8rem;
 }
 
 .progress-bar {
   height: 4px;
-  background-color: rgba(255, 255, 255, 0.3);
-  margin-top: -2px;
-  border-radius: 2px;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 0.5rem;
   cursor: pointer;
-  
   .progress-fill {
-    width: 30%;
     height: 100%;
-    background-color: #e74c3c;
-    border-radius: 2px;
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      right: -6px;
-      top: -4px;
-      width: 12px;
-      height: 12px;
-      background-color: #e74c3c;
-      border-radius: 50%;
-    }
+    width: 35%;
+    background-color: var(--accent-color);
   }
 }
 
 .controls-row {
   display: flex;
   align-items: center;
-  height: 100%;
-  font-size: 0.9rem;
-  color: #ccc;
-  
-  .spacer {
-    flex: 1;
-  }
+  .spacer { flex: 1; }
 }
 
-.video-info {
-  max-width: 1200px;
-  margin: 1.5rem auto 0;
-  width: 100%;
-  
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  p {
-    color: #95a5a6;
-    font-size: 1rem;
-  }
-}
-
-.sidebar {
-  width: 350px;
-  background-color: #1a1d24;
-  border-left: 1px solid #2c313c;
+/* Seating Section */
+.seating-section {
+  margin-top: 2rem;
+  padding: 0 2rem 4rem;
   display: flex;
   flex-direction: column;
-}
-
-.online-users {
-  padding: 1.5rem;
-  border-bottom: 1px solid #2c313c;
-  
-  h3 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: #ecf0f1;
-  }
-}
-
-.user-list {
-  list-style: none;
-  max-height: 200px;
-  overflow-y: auto;
-  
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #4a5568;
-    border-radius: 3px;
-  }
-}
-
-.user-item {
-  display: flex;
   align-items: center;
-  padding: 0.5rem 0;
-  gap: 0.8rem;
+  position: relative;
+}
+
+.seating-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); // Two rows of 4
+  gap: 2rem 3rem;
+  max-width: 800px;
+  z-index: 5;
+}
+
+.seat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.audience-member {
+  width: 60px;
+  height: 60px;
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 2;
   
-  .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: white;
-    font-size: 0.9rem;
-  }
-  
-  span {
-    color: #cbd5e0;
-    font-size: 0.95rem;
-  }
-  
-  .host-badge {
-    margin-left: auto;
-    background-color: #e74c3c;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: bold;
+  .npc-head {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 50% 50% 10px 10px;
+    filter: brightness(0.7) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    transition: filter 0.3s;
+
+    &:hover {
+      filter: brightness(1);
+    }
   }
 }
 
-.chat-room {
-  flex: 1;
+.seat-chair {
+  width: 70px;
+  height: 40px;
+  background-color: var(--bg-nav);
+  border-radius: 10px 10px 2px 2px;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
+  position: relative;
+
+  &::before { // Chair back
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 5px;
+    right: 5px;
+    height: 35px;
+    background-color: var(--bg-nav);
+    border-radius: 8px 8px 0 0;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+  }
+}
+
+.floor-shadow {
+  position: absolute;
+  top: 50%;
+  width: 90%;
+  height: 100px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Chat Sidebar */
+.chat-sidebar {
+  width: 320px;
+  background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s ease;
+}
+
+.chat-header {
   padding: 1.5rem;
-  overflow: hidden;
-  
-  h3 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: #ecf0f1;
-  }
+  border-bottom: 1px solid var(--border-color);
+  h3 { color: var(--text-main); margin-bottom: 0.2rem; }
+  .viewer-count { color: var(--text-muted); font-size: 0.8rem; }
 }
 
 .chat-messages {
   flex: 1;
+  padding: 1.5rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-  padding-right: 0.5rem;
+  gap: 1rem;
   
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #4a5568;
-    border-radius: 3px;
-  }
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
 }
 
 .message {
+  font-size: 0.95rem;
   line-height: 1.4;
-  word-break: break-word;
-  
-  .msg-author {
-    font-weight: bold;
-    margin-right: 0.4rem;
-  }
-  
-  .msg-text {
-    color: #e2e8f0;
-  }
+  .msg-author { font-weight: bold; margin-right: 0.5rem; }
+  .msg-text { color: var(--text-main); }
 }
 
 .chat-input-area {
+  padding: 1rem;
   display: flex;
   gap: 0.5rem;
-  
+  background-color: var(--bg-main);
+  border-top: 1px solid var(--border-color);
+
   input {
     flex: 1;
-    background-color: #2d3748;
-    border: 1px solid #4a5568;
-    color: white;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     padding: 0.6rem 1rem;
     border-radius: 20px;
+    color: var(--text-main);
     outline: none;
-    transition: border-color 0.2s;
-    
-    &:focus {
-      border-color: #3498db;
-    }
-    
-    &::placeholder {
-      color: #a0aec0;
-    }
+    &::placeholder { color: var(--text-muted); }
   }
-  
+
   button {
-    background-color: #3498db;
+    background-color: var(--accent-color);
     color: white;
-    border: none;
-    padding: 0 1.2rem;
+    padding: 0 1rem;
     border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
-    
-    &:hover {
-      background-color: #2980b9;
-    }
+    font-weight: bold;
+    &:hover { background-color: var(--accent-hover); }
   }
 }
 </style>
+
